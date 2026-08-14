@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.config
+package uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesofauthority
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Json, OFormat}
 
-@Singleton
-class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
-  val appName: String = config.get[String]("appName")
+case class CertificatesOfAuthority(
+  certificatesYesNo: Option[CertificatesOfAuthorityYesNo] = None,
+  fcaArticles: Option[Seq[FcaArticles]] = None,
+  financialOrganisation: Option[Seq[FinancialOrganisation]]
+)
 
-  lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
+object CertificatesOfAuthority {
+  implicit val format: OFormat[CertificatesOfAuthority] = Json.format[CertificatesOfAuthority]
 }

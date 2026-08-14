@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.config
+package uk.gov.hmrc.disaaccount.models.registrationDetails.thirdparty
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.disaaccount.models.YesNoAnswer
 
-@Singleton
-class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
-  val appName: String = config.get[String]("appName")
+case class ThirdPartyOrganisations(
+  managedByThirdParty: Option[YesNoAnswer] = None,
+  thirdParties: Seq[ThirdParty] = Nil,
+  connectedOrganisations: Seq[String] = Seq.empty
+)
 
-  lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
+object ThirdPartyOrganisations {
+  implicit val format: OFormat[ThirdPartyOrganisations] = Json.format[ThirdPartyOrganisations]
 }

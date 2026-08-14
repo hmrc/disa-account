@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.config
+package uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesofauthority
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.disaaccount.models.{Enumerable, WithName}
 
-@Singleton
-class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
-  val appName: String = config.get[String]("appName")
+sealed trait CertificatesOfAuthorityYesNo
 
-  lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
+object CertificatesOfAuthorityYesNo extends Enumerable.Implicits {
+
+  case object Yes extends WithName("yes") with CertificatesOfAuthorityYesNo
+  case object No extends WithName("no") with CertificatesOfAuthorityYesNo
+
+  val values: Seq[CertificatesOfAuthorityYesNo] = Seq(
+    Yes,
+    No
+  )
+
+  implicit val enumerable: Enumerable[CertificatesOfAuthorityYesNo] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

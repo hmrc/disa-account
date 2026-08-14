@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.config
+package uk.gov.hmrc.disaaccount.models.registrationDetails
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.libs.json.{Json, OFormat}
 
-@Singleton
-class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
-  val appName: String = config.get[String]("appName")
+case class BusinessVerification(
+  ctUtr: Option[String],
+  companyName: Option[String],
+  companyNumber: Option[String],
+  businessPartnerId: Option[String]
+)
 
-  lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
+object BusinessVerification {
+  implicit val format: OFormat[BusinessVerification] = Json.format[BusinessVerification]
 }
