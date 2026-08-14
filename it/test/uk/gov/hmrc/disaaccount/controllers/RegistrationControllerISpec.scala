@@ -62,7 +62,7 @@ class RegistrationControllerISpec extends BaseIntegrationSpec {
 
       val result = retrieveRegistrationDetailsRequest()
 
-      result.status shouldBe BAD_GATEWAY
+      result.status shouldBe INTERNAL_SERVER_ERROR
     }
 
     "return 401 Unauthorized for an unauthorised request" in {

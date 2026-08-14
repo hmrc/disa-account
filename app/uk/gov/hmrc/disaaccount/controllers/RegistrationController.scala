@@ -41,7 +41,7 @@ class RegistrationController @Inject() (
       etmpConnector
         .getRegistrationDetails(zref)
         .map {
-          case Right(registrationDetails)                 =>
+          case Right(registrationDetails)         =>
             Ok(Json.toJson(registrationDetails))
           case Left(err) if err.statusCode == 404 =>
             logger.info(
@@ -52,7 +52,7 @@ class RegistrationController @Inject() (
             logger.error(
               s"[RegistrationController][retrieveRegistrationDetails] Unexpected error retrieving registration details from ETMP for zref: [$zref], status: [${err.statusCode}]"
             )
-            BadGateway
+            InternalServerError
         }
         .recover { case NonFatal(e) =>
           logger.error(

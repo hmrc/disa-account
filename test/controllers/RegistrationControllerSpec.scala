@@ -67,7 +67,7 @@ class RegistrationControllerSpec extends BaseUnitSpec {
 
       val result = controller.retrieveRegistrationDetails(testZref)(FakeRequest())
 
-      status(result) shouldBe BAD_GATEWAY
+      status(result) shouldBe INTERNAL_SERVER_ERROR
     }
 
     "return 500 InternalServerError when the connector call fails with an unexpected exception" in {
