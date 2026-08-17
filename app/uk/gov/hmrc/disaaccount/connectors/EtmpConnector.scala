@@ -16,23 +16,42 @@
 
 package uk.gov.hmrc.disaaccount.connectors
 
+import com.typesafe.config.Config
+import org.apache.pekko.actor.ActorSystem
 import uk.gov.hmrc.disaaccount.config.AppConfig
 import uk.gov.hmrc.disaaccount.models.registrationDetails.RegistrationDetails
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, Retries, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class EtmpConnector @Inject() (http: HttpClientV2, appConfig: AppConfig)(implicit ec: ExecutionContext) {
+class EtmpConnector @Inject() (
+  http: HttpClientV2,
+  appConfig: AppConfig,
+  protected val configuration: Config,
+  protected val actorSystem: ActorSystem
+)(implicit ec: ExecutionContext)
+    extends Retries {
+
+  private val retryCondition: PartialFunction[Exception, Boolean] = {
+    case UpstreamErrorResponse.Upstream5xxResponse(_) => true
+  }
 
   def getRegistrationDetails(
     zref: String
   )(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, RegistrationDetails]] = {
     val url = s"${appConfig.etmpBaseUrl}/etmp/registration/$zref"
-    http
-      .get(url"$url")
-      .execute[Either[UpstreamErrorResponse, RegistrationDetails]]
+    retryFor[RegistrationDetails]("get ETMP registration details")(retryCondition) {
+      http
+        .get(url"$url")
+        .execute[Either[UpstreamErrorResponse, RegistrationDetails]]
+        .flatMap {
+          case Right(details) => Future.successful(details)
+          case Left(error)    => Future.failed(error)
+        }
+    }.map(Right(_))
+      .recover { case error: UpstreamErrorResponse => Left(error) }
   }
 }

@@ -16,6 +16,8 @@
 
 package utils
 
+import com.typesafe.config.Config
+import org.apache.pekko.actor.ActorSystem
 import org.mockito.Mockito
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
@@ -50,6 +52,9 @@ abstract class BaseUnitSpec
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
 
+  lazy val retryConfig: Config      = app.configuration.underlying
+  lazy val actorSystem: ActorSystem = app.actorSystem
+
   val mockHttpClient: HttpClientV2       = mock[HttpClientV2]
   val mockAppConfig: AppConfig           = mock[AppConfig]
   val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
@@ -60,6 +65,7 @@ abstract class BaseUnitSpec
     Mockito.reset(mockHttpClient, mockAppConfig, mockRequestBuilder, mockAuthConnector, mockEtmpConnector)
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
+    .configure("http-verbs.retries.intervals" -> Seq("1ms", "1ms", "1ms"))
     .overrides(
       bind[AuthConnector].toInstance(mockAuthConnector),
       bind[AppConfig].toInstance(mockAppConfig),

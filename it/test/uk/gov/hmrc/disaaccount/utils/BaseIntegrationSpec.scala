@@ -53,13 +53,14 @@ trait BaseIntegrationSpec
     .overrides(overrides: _*)
     .build()
 
-  def config: Map[String, String] =
+  def config: Map[String, Any] =
     Map(
       "auditing.enabled"                -> "false",
       "microservice.services.auth.host" -> wiremockHost,
       "microservice.services.auth.port" -> wiremockPort.toString,
       "microservice.services.etmp.host" -> wiremockHost,
-      "microservice.services.etmp.port" -> wiremockPort.toString
+      "microservice.services.etmp.port" -> wiremockPort.toString,
+      "http-verbs.retries.intervals"    -> Seq("1ms", "1ms", "1ms")
     )
 
   override def beforeAll(): Unit = {

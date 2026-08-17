@@ -28,7 +28,7 @@ import scala.concurrent.Future
 class EtmpConnectorSpec extends BaseUnitSpec {
 
   trait TestSetup {
-    val connector: EtmpConnector = new EtmpConnector(mockHttpClient, mockAppConfig)
+    val connector: EtmpConnector = new EtmpConnector(mockHttpClient, mockAppConfig, retryConfig, actorSystem)
 
     val testUrl: String = "http://localhost:1201"
     when(mockAppConfig.etmpBaseUrl).thenReturn(testUrl)
