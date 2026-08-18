@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.config
+package uk.gov.hmrc.disaaccount.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+sealed trait YesNoAnswer
 
-@Singleton
-class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
-  val appName: String = config.get[String]("appName")
+object YesNoAnswer extends Enumerable.Implicits {
 
-  lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
+  case object Yes extends WithName("yes") with YesNoAnswer
+  case object No extends WithName("no") with YesNoAnswer
+
+  val values: Seq[YesNoAnswer] = Seq(
+    Yes,
+    No
+  )
+
+  implicit val enumerable: Enumerable[YesNoAnswer] =
+    Enumerable(values.map(v => v.toString -> v): _*)
 }

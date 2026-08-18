@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.config
+package uk.gov.hmrc.disaaccount.utils
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import play.api.http.Status.{OK, UNAUTHORIZED}
+import uk.gov.hmrc.disaaccount.utils.WiremockHelper.stubPost
 
-@Singleton
-class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
-  val appName: String = config.get[String]("appName")
+trait CommonStubs {
 
-  lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
+  def stubAuth(): Unit = stubPost(url = "/auth/authorise", status = OK, responseBody = "{}")
+
+  def stubAuthFail(): Unit = stubPost(url = "/auth/authorise", status = UNAUTHORIZED, responseBody = "{}")
+
+  val testHeaders: Seq[(String, String)] = Seq("Authorization" -> "mock-bearer-token")
+
 }
