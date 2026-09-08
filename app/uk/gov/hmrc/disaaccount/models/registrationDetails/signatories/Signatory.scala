@@ -21,7 +21,8 @@ import play.api.libs.json.{Json, OFormat}
 case class Signatory(
   id: String,
   fullName: Option[String] = None,
-  jobTitle: Option[String] = None
+  jobTitle: Option[String] = None,
+  email: Option[String] = None
 )
 
 object Signatory {
