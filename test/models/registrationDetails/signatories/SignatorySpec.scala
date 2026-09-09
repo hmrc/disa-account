@@ -28,7 +28,7 @@ class SignatorySpec extends AnyWordSpec with Matchers {
     "read and write an email address" in {
       val signatory = Signatory("1", Some("Jane Smith"), Some("Director"), Some("jane.smith@example.com"))
 
-      Json.toJson(signatory).as[Signatory] shouldBe signatory
+      Json.toJson(signatory).as[Signatory]          shouldBe signatory
       (Json.toJson(signatory) \ "email").as[String] shouldBe "jane.smith@example.com"
     }
 
