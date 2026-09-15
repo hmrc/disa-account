@@ -1,7 +1,7 @@
 
 # disa-account
 
-This is a placeholder README.md for a new repository
+This is the backend service for managing accounts in Manage ISAs.
 
 ### License
 

@@ -21,6 +21,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
+import play.api.http.Status.OK
 import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -49,4 +50,4 @@ class HealthEndpointIntegrationSpec
           .execute()
           .futureValue
 
-      response.status shouldBe 200
+      response.status shouldBe OK
