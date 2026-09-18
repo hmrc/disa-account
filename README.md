@@ -1,7 +1,7 @@
 
 # disa-account
 
-This is a placeholder README.md for a new repository
+This is backend service for disa-account-frontend.
 
 ### License
 
