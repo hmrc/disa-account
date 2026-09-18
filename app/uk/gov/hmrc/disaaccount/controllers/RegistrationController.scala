@@ -17,10 +17,12 @@
 package uk.gov.hmrc.disaaccount.controllers
 
 import play.api.Logging
+import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.disaaccount.connectors.EtmpConnector
+import uk.gov.hmrc.disaaccount.models.registrationDetails.UpdateRegistrationDetailsRequest
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
@@ -41,14 +43,14 @@ class RegistrationController @Inject() (
       etmpConnector
         .getRegistrationDetails(zref)
         .map {
-          case Right(registrationDetails)         =>
+          case Right(registrationDetails)               =>
             Ok(Json.toJson(registrationDetails))
-          case Left(err) if err.statusCode == 404 =>
+          case Left(err) if err.statusCode == NOT_FOUND =>
             logger.info(
               s"[RegistrationController][retrieveRegistrationDetails] No registration details found in ETMP for zref: [$zref]"
             )
             NotFound
-          case Left(err)                          =>
+          case Left(err)                                =>
             logger.error(
               s"[RegistrationController][retrieveRegistrationDetails] Unexpected error retrieving registration details from ETMP for zref: [$zref], status: [${err.statusCode}]"
             )
@@ -63,4 +65,24 @@ class RegistrationController @Inject() (
         }
     }
   }
+
+  def updateRegistrationDetails(zref: String): Action[UpdateRegistrationDetailsRequest] =
+    Action.async(parse.json[UpdateRegistrationDetailsRequest]) { implicit request =>
+      authorised() {
+        etmpConnector
+          .updateRegistrationDetails(zref, request.body)
+          .map {
+            case Right(_)                                 => Ok
+            case Left(err) if err.statusCode == NOT_FOUND => NotFound
+            case Left(_)                                  => InternalServerError
+          }
+          .recover { case NonFatal(e) =>
+            logger.error(
+              s"[RegistrationController][updateRegistrationDetails] Unexpected error updating registration details for zref: [$zref]",
+              e
+            )
+            InternalServerError
+          }
+      }
+    }
 }

@@ -17,10 +17,13 @@
 package uk.gov.hmrc.disaaccount.connectors
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{verify, when}
+import play.api.http.Status.{NOT_FOUND, OK}
+import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import org.scalatest.matchers.must.Matchers.mustBe
-import uk.gov.hmrc.disaaccount.models.registrationDetails.RegistrationDetails
-import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.disaaccount.models.registrationDetails.{RegistrationDetails, UpdateRegistrationDetailsRequest}
+import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 import utils.BaseUnitSpec
 
 import scala.concurrent.Future
@@ -52,8 +55,8 @@ class EtmpConnectorSpec extends BaseUnitSpec {
     "return Left(UpstreamErrorResponse) when ETMP returns a 404" in new TestSetup {
       val notFound: UpstreamErrorResponse = UpstreamErrorResponse(
         message = "Not found",
-        statusCode = 404,
-        reportAs = 404,
+        statusCode = NOT_FOUND,
+        reportAs = NOT_FOUND,
         headers = Map.empty
       )
 
@@ -75,6 +78,31 @@ class EtmpConnectorSpec extends BaseUnitSpec {
       val thrown: Throwable = connector.getRegistrationDetails(testZref).failed.futureValue
 
       thrown mustBe ex
+    }
+  }
+
+  "EtmpConnector.updateRegistrationDetails" should {
+    "send the typed request and return Right when the call succeeds" in new TestSetup {
+      val details = UpdateRegistrationDetailsRequest(tradingName = Some("Updated name"))
+      when(mockHttpClient.put(url"$testUrl/etmp/registration/$testZref")).thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.withBody(Json.toJson(details))).thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
+        .thenReturn(Future.successful(Right(HttpResponse(OK, ""))))
+
+      connector.updateRegistrationDetails(testZref, details).futureValue mustBe Right(())
+
+      verify(mockRequestBuilder).withBody(Json.toJson(details))
+    }
+
+    "return Left when ETMP cannot find the registration" in new TestSetup {
+      val details  = UpdateRegistrationDetailsRequest()
+      val notFound = UpstreamErrorResponse("Not found", NOT_FOUND, NOT_FOUND, Map.empty)
+      when(mockHttpClient.put(url"$testUrl/etmp/registration/$testZref")).thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.withBody(Json.toJson(details))).thenReturn(mockRequestBuilder)
+      when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
+        .thenReturn(Future.successful(Left(notFound)))
+
+      connector.updateRegistrationDetails(testZref, details).futureValue mustBe Left(notFound)
     }
   }
 }

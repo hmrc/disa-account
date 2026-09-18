@@ -1,4 +1,4 @@
 # microservice specific routes
 
 GET     /registration/:zref    uk.gov.hmrc.disaaccount.controllers.RegistrationController.retrieveRegistrationDetails(zref: String)
-
+PUT     /registration/:zref    uk.gov.hmrc.disaaccount.controllers.RegistrationController.updateRegistrationDetails(zref: String)
