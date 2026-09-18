@@ -19,10 +19,12 @@ package uk.gov.hmrc.disaaccount.connectors
 import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import uk.gov.hmrc.disaaccount.config.AppConfig
-import uk.gov.hmrc.disaaccount.models.registrationDetails.RegistrationDetails
+import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.disaaccount.models.registrationDetails.{RegistrationDetails, UpdateRegistrationDetailsRequest}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, Retries, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Retries, StringContextOps, UpstreamErrorResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,4 +60,22 @@ class EtmpConnector @Inject() (
   // ETMP flags a change under review on ISA product this surfaces it as a top-level flag for callers.
   private def withIsaProductsChangeUnderReview(details: RegistrationDetails): RegistrationDetails =
     details.copy(isaProductsChangeUnderReview = details.isaProducts.exists(_.underReview))
+
+  def updateRegistrationDetails(
+    zref: String,
+    details: UpdateRegistrationDetailsRequest
+  )(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, Unit]] = {
+    val url = s"${appConfig.etmpBaseUrl}/etmp/registration/$zref"
+    retryFor[HttpResponse]("update ETMP registration details")(retryCondition) {
+      http
+        .put(url"$url")
+        .withBody(Json.toJson(details))
+        .execute[Either[UpstreamErrorResponse, HttpResponse]]
+        .flatMap {
+          case Right(response) => Future.successful(response)
+          case Left(error)     => Future.failed(error)
+        }
+    }.map(_ => Right(()))
+      .recover { case error: UpstreamErrorResponse => Left(error) }
+  }
 }
