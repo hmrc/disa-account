@@ -20,6 +20,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.when
 import org.scalatest.matchers.must.Matchers.mustBe
 import uk.gov.hmrc.disaaccount.models.registrationDetails.RegistrationDetails
+import uk.gov.hmrc.disaaccount.models.registrationDetails.isaProducts.IsaProducts
 import uk.gov.hmrc.http.{StringContextOps, UpstreamErrorResponse}
 import utils.BaseUnitSpec
 
@@ -47,6 +48,28 @@ class EtmpConnectorSpec extends BaseUnitSpec {
         connector.getRegistrationDetails(testZref).futureValue
 
       result mustBe Right(testJourneyData)
+    }
+
+    "surface isaProducts.underReview as the top-level isaProductsChangeUnderReview flag" in new TestSetup {
+      val etmpResponse: RegistrationDetails = testJourneyData.copy(
+        isaProducts = Some(
+          IsaProducts(
+            isaProducts = None,
+            innovativeFinancialProducts = None,
+            p2pPlatform = None,
+            p2pPlatformNumber = None,
+            underReview = true
+          )
+        )
+      )
+
+      when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, RegistrationDetails]](any(), any()))
+        .thenReturn(Future.successful(Right(etmpResponse)))
+
+      val result: Either[UpstreamErrorResponse, RegistrationDetails] =
+        connector.getRegistrationDetails(testZref).futureValue
+
+      result.map(_.isaProductsChangeUnderReview) mustBe Right(true)
     }
 
     "return Left(UpstreamErrorResponse) when ETMP returns a 404" in new TestSetup {
