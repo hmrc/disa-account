@@ -1,7 +1,7 @@
 
 # disa-account
 
-This is backend service for disa-account-frontend.
+This is the backend service for managing accounts in Manage ISAs.
 
 ### License
 
