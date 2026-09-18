@@ -53,9 +53,13 @@ class EtmpConnector @Inject() (
           case Right(details) => Future.successful(details)
           case Left(error)    => Future.failed(error)
         }
-    }.map(Right(_))
+    }.map(details => Right(withIsaProductsChangeUnderReview(details)))
       .recover { case error: UpstreamErrorResponse => Left(error) }
   }
+
+  // ETMP flags a change under review on ISA product this surfaces it as a top-level flag for callers.
+  private def withIsaProductsChangeUnderReview(details: RegistrationDetails): RegistrationDetails =
+    details.copy(isaProductsChangeUnderReview = details.isaProducts.exists(_.underReview))
 
   def updateRegistrationDetails(
     zref: String,
