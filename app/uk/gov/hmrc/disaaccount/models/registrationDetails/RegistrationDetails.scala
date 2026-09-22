@@ -39,7 +39,8 @@ case class RegistrationDetails(
   liaisonOfficers: Option[LiaisonOfficers] = None,
   signatories: Option[Signatories] = None,
   thirdPartyOrganisations: Option[ThirdPartyOrganisations] = None,
-  lastUpdated: Option[Instant] = None
+  lastUpdated: Option[Instant] = None,
+  isaProductsChangeUnderReview: Boolean = false
 )
 
 object RegistrationDetails {

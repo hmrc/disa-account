@@ -22,7 +22,8 @@ case class IsaProducts(
   isaProducts: Option[Seq[IsaProduct]],
   innovativeFinancialProducts: Option[Seq[InnovativeFinancialProduct]],
   p2pPlatform: Option[String],
-  p2pPlatformNumber: Option[String]
+  p2pPlatformNumber: Option[String],
+  underReview: Boolean = false
 )
 
 object IsaProducts {
