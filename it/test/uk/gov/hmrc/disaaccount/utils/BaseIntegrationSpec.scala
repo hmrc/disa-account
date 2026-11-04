@@ -55,6 +55,9 @@ trait BaseIntegrationSpec
 
   def config: Map[String, Any] =
     Map(
+      "create-internal-auth-token-on-start" -> false,
+      "microservice.services.internal-auth.host" -> wiremockHost,
+      "microservice.services.internal-auth.port" -> wiremockPort,
       "auditing.enabled"                -> "false",
       "microservice.services.auth.host" -> wiremockHost,
       "microservice.services.auth.port" -> wiremockPort.toString,

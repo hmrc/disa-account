@@ -65,6 +65,7 @@ abstract class BaseUnitSpec
     Mockito.reset(mockHttpClient, mockAppConfig, mockRequestBuilder, mockAuthConnector, mockEtmpConnector)
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
+    .configure("create-internal-auth-token-on-start" -> false)
     .configure("http-verbs.retries.intervals" -> Seq("1ms", "1ms", "1ms"))
     .overrides(
       bind[AuthConnector].toInstance(mockAuthConnector),

@@ -24,5 +24,9 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
   val appName: String = config.get[String]("appName")
 
+  lazy val internalAuthService: String   = servicesConfig.baseUrl("internal-auth")
+  lazy val internalAuthToken: String     = config.get[String]("internal-auth.local-client-token")
+  lazy val internalAuthPrincipal: String = config.get[String]("internal-auth.local-client-principal")
+
   lazy val etmpBaseUrl: String = servicesConfig.baseUrl(serviceName = "etmp")
 }
