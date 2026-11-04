@@ -1,0 +1,19 @@
+meta {
+  name: 400-invalid-zref
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/z1234
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{internalAuthToken}}
+}
+
+assert {
+  res.status: 400
+}
