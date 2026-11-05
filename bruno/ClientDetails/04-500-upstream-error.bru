@@ -1,0 +1,19 @@
+meta {
+  name: 500-upstream-error
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/Z0500
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{internalAuthToken}}
+}
+
+assert {
+  res.status: 500
+}

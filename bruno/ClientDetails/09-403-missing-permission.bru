@@ -1,0 +1,19 @@
+meta {
+  name: 403-missing-permission
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/Z1234
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{forbiddenToken}}
+}
+
+assert {
+  res.status: 403
+}

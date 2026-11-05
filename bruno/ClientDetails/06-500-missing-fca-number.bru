@@ -1,0 +1,19 @@
+meta {
+  name: 500-missing-fca-number
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/Z0502
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{internalAuthToken}}
+}
+
+assert {
+  res.status: 500
+}

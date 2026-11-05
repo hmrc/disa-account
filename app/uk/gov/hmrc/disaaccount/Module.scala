@@ -20,13 +20,19 @@ import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module => AppModule}
 
 import java.time.Clock
+import uk.gov.hmrc.disaaccount.config.{InternalAuthTokenInitialiser, InternalAuthTokenInitialiserImpl, NoOpInternalAuthTokenInitialiser}
 
 class Module extends AppModule {
 
   override def bindings(
     environment: Environment,
     configuration: Configuration
-  ): Seq[Binding[_]] =
-    bind[Clock].toInstance(Clock.systemDefaultZone) :: // inject if current time needs to be controlled in unit tests
-      Nil
+  ): Seq[Binding[_]] = {
+    val initialiser = if (configuration.get[Boolean]("create-internal-auth-token-on-start")) {
+      bind[InternalAuthTokenInitialiser].to[InternalAuthTokenInitialiserImpl]
+    } else {
+      bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
+    }
+    Seq(bind[Clock].toInstance(Clock.systemDefaultZone), bind[AppInitialiser].toSelf.eagerly(), initialiser)
+  }
 }
