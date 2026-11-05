@@ -38,7 +38,8 @@ class ClientDetailsController @Inject() (
     with Logging {
 
   def get(zref: String): Action[AnyContent] = auth.authorizedAction(readPermission).async { implicit request =>
-    if (!ZReferenceValidator.isValid(zref)) Future.successful(BadRequest)
+    if (!ZReferenceValidator.isValid(zref))
+      Future.successful(BadRequest(Json.obj("message" -> ClientDetailsErrors.invalidZRef)))
     else
       etmpConnector
         .getRegistrationDetails(zref)
@@ -53,16 +54,17 @@ class ClientDetailsController @Inject() (
                 logger.error(
                   s"[ClientDetailsController][get] Incomplete ETMP client details; missing fields: ${missing.mkString(", ")}"
                 )
-                InternalServerError
+                InternalServerError(Json.obj("message" -> ClientDetailsErrors.missingClientDetails))
             }
-          case Left(error) if error.statusCode == NOT_FOUND => NotFound
+          case Left(error) if error.statusCode == NOT_FOUND =>
+            NotFound(Json.obj("message" -> ClientDetailsErrors.clientNotFound))
           case Left(error)                                  =>
             logger.error(s"[ClientDetailsController][get] ETMP lookup failed; status: ${error.statusCode}")
-            InternalServerError
+            InternalServerError(Json.obj("message" -> ClientDetailsErrors.lookupFailed))
         }
         .recover { case NonFatal(error) =>
           logger.error(s"[ClientDetailsController][get] ETMP lookup failed; exception: ${error.getClass.getSimpleName}")
-          InternalServerError
+          InternalServerError(Json.obj("message" -> ClientDetailsErrors.lookupFailed))
         }
   }
 
@@ -70,4 +72,11 @@ class ClientDetailsController @Inject() (
     Resource(ResourceType("disa-account"), ResourceLocation("client-details")),
     IAAction("READ")
   )
+}
+
+private object ClientDetailsErrors {
+  val invalidZRef: String          = "Invalid Z-Ref: expected Z followed by four digits"
+  val clientNotFound: String       = "Client not found in ETMP"
+  val missingClientDetails: String = "Required client details are missing"
+  val lookupFailed: String         = "Error retrieving client details from ETMP"
 }

@@ -15,8 +15,15 @@ Z-Refs must match `^Z[0-9]{4}$`.
 {"businessName":"Test Isa Manager Ltd","fcaNumber":"123456"}
 ```
 
-Missing, null or blank required fields produce 500. Upstream 404 produces 404; other failures,
-malformed responses and timeouts produce 500.
+Application-generated errors use JSON with a `message` field:
+
+| Status | Context | Message |
+| --- | --- | --- |
+| 400 | The Z-Ref fails format validation. | `Invalid Z-Ref: expected Z followed by four digits` |
+| 404 | ETMP confirms that no matching client exists. | `Client not found in ETMP` |
+| 500 | The matching client is missing a business name or FCA number. | `Required client details are missing` |
+| 500 | The ETMP lookup fails, times out or returns an invalid response. | `Error retrieving client details from ETMP` |
+
 Internal-auth supplies its standard authentication/permission failure responses (401/403).
 
 ## Running the app
