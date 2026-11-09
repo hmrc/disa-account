@@ -1,0 +1,19 @@
+meta {
+  name: 404-not-found
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/Z0404
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{internalAuthToken}}
+}
+
+assert {
+  res.status: 404
+}
