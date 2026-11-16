@@ -37,11 +37,15 @@ class AgentDelegatedEnrolmentAuthoriser @Inject() (authConnector: AuthConnector)
     val delegatedEnrolmentPredicate =
       Enrolment(disaEnrolment).withIdentifier(zReferenceIdentifier, zReference).withDelegatedAuthRule(delegatedAuthRule)
 
-    logger.debug(s"[AgentDelegatedEnrolmentAuthoriser][authorise] Checking DISA enrolment access for session ID [${request.sessionId}]")
+    logger.debug(
+      s"[AgentDelegatedEnrolmentAuthoriser][authorise] Checking DISA enrolment access for session ID [${request.sessionId}]"
+    )
     authConnector
       .authorise(delegatedEnrolmentPredicate, EmptyRetrieval)
       .map[Option[Result]] { _ =>
-        logger.debug(s"[AgentDelegatedEnrolmentAuthoriser][authorise] DISA enrolment access authorised for session ID [${request.sessionId}]")
+        logger.debug(
+          s"[AgentDelegatedEnrolmentAuthoriser][authorise] DISA enrolment access authorised for session ID [${request.sessionId}]"
+        )
         None
       }
       .recover {
@@ -55,5 +59,9 @@ class AgentDelegatedEnrolmentAuthoriser @Inject() (authConnector: AuthConnector)
   }
 
   private def agentClientRelationshipNotEstablished: Result =
-    Results.Forbidden(Json.toJson(ErrorResponse(agentClientRelationshipNotEstablishedCode, agentClientRelationshipNotEstablishedMessage)))
+    Results.Forbidden(
+      Json.toJson(
+        ErrorResponse(agentClientRelationshipNotEstablishedCode, agentClientRelationshipNotEstablishedMessage)
+      )
+    )
 }

@@ -50,7 +50,7 @@ class AgentPreferencesControllerSpec extends UnitSpecBase {
     new AgentPreferencesSetActionImpl(authoriser)
   )
 
-  private val agentPredicate = AffinityGroup.Agent and Enrolment(agentEnrolment)
+  private val agentPredicate                   = AffinityGroup.Agent and Enrolment(agentEnrolment)
   private def delegatedPredicate(zref: String) =
     Enrolment(disaEnrolment).withIdentifier(zReferenceIdentifier, zref).withDelegatedAuthRule(delegatedAuthRule)
 
@@ -229,7 +229,10 @@ class AgentPreferencesControllerSpec extends UnitSpecBase {
 
         Seq(getAgentPreferences(), setAgentPreferences(validBody)).foreach { result =>
           status(result)        shouldBe FORBIDDEN
-          contentAsJson(result) shouldBe Json.obj(errorCodeField -> userIsNotAnAgentCode, errorMessageField -> userIsNotAnAgentMessage)
+          contentAsJson(result) shouldBe Json.obj(
+            errorCodeField    -> userIsNotAnAgentCode,
+            errorMessageField -> userIsNotAnAgentMessage
+          )
         }
         verifyNoInteractions(service)
       }

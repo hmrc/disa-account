@@ -40,7 +40,9 @@ class AgentPreferencesSetActionImpl @Inject() (authoriser: AgentDelegatedEnrolme
     }
     zReference.filter(ZReferenceValidator.isValid) match {
       case Some(value) =>
-        logger.debug(s"[AgentPreferencesSetAction][refine] Valid preference submitted for session ID [${request.sessionId}]")
+        logger.debug(
+          s"[AgentPreferencesSetAction][refine] Valid preference submitted for session ID [${request.sessionId}]"
+        )
         authoriser.authorise(request, value).map(_.toLeft(AgentPreferencesRequest(request, value)))
       case None        =>
         logger.warn("[AgentPreferencesSetAction][refine] Invalid agent preferences body")

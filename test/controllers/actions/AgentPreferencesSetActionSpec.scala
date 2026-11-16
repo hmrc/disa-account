@@ -68,7 +68,8 @@ class AgentPreferencesSetActionSpec extends UnitSpecBase {
     }
 
     "reject a non-JSON body when invoked directly" in {
-      val request = AgentRequest(FakeRequest(PUT, "/disa-account/agents/preferences").withBody("not-json"), "auth-session")
+      val request =
+        AgentRequest(FakeRequest(PUT, "/disa-account/agents/preferences").withBody("not-json"), "auth-session")
       val result  = action.invokeBlock(request, identified => Future.successful(Ok(identified.zReference)))
 
       status(result)        shouldBe BAD_REQUEST

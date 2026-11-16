@@ -57,11 +57,15 @@ class AgentPreferencesGetActionImpl @Inject() (
             case None if preferences.expiresAt.isAfter(Instant.now(clock)) =>
               Right(AgentPreferencesRequest(request, preferences.zReference))
             case None                                                      =>
-              logger.debug(s"[AgentPreferencesGetAction][refine] Stored preferences expired during delegated check for session ID [${request.sessionId}]")
+              logger.debug(
+                s"[AgentPreferencesGetAction][refine] Stored preferences expired during delegated check for session ID [${request.sessionId}]"
+              )
               Left(notFound(request.sessionId))
           }
         case Right(None)              =>
-          logger.debug(s"[AgentPreferencesGetAction][refine] No unexpired preferences found for session ID [${request.sessionId}]")
+          logger.debug(
+            s"[AgentPreferencesGetAction][refine] No unexpired preferences found for session ID [${request.sessionId}]"
+          )
           Future.successful(Left(notFound(request.sessionId)))
         case Left(result)             => Future.successful(Left(result))
       }
