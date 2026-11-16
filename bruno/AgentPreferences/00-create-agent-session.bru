@@ -1,0 +1,63 @@
+meta {
+  name: 00-create-agent-session
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{authLoginBaseUrl}}/government-gateway/session/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "credId": "{{credId}}",
+    "affinityGroup": "Agent",
+    "credentialStrength": "strong",
+    "credentialRole": "admin",
+    "enrolments": [
+      {
+        "key": "HMRC-AS-AGENT",
+        "identifiers": [{"key": "AgentReferenceNumber", "value": "TARN0000001"}],
+        "state": "Activated"
+      }
+    ],
+    "delegatedEnrolments": [
+      {
+        "key": "HMRC-DISA-ORG",
+        "identifiers": [{"key": "ZREF", "value": "{{zReference}}"}],
+        "delegatedAuthRule": "disa-auth"
+      },
+      {
+        "key": "HMRC-DISA-ORG",
+        "identifiers": [{"key": "ZREF", "value": "{{alternateZReference}}"}],
+        "delegatedAuthRule": "disa-auth"
+      }
+    ],
+    "mdtpInformation": {
+      "deviceId": "bruno-device",
+      "sessionId": "bruno-{{credId}}"
+    }
+  }
+}
+
+script:pre-request {
+  bru.setVar("credId", String(Date.now()) + String(Math.floor(Math.random() * 1000)).padStart(3, "0"));
+}
+
+script:post-response {
+  const authorisation = res.getHeader("Authorization");
+  if (!authorisation) {
+    throw new Error("auth-login-api did not return an Authorization header");
+  }
+  bru.setVar("agentAuthorisation", authorisation);
+}
+
+assert {
+  res.status: 201
+}

@@ -27,11 +27,11 @@ import play.api.libs.ws.WSClient
 import play.api.test.DefaultAwaitTimeout
 import uk.gov.hmrc.disaaccount.utils.WiremockHelper.{wiremockHost, wiremockPort}
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.TestData
+import utils.{InjectorSupport, TestData}
 
 import scala.concurrent.ExecutionContext
 
-trait BaseIntegrationSpec
+trait IntegrationSpecBase
     extends AnyWordSpec
     with Matchers
     with GuiceOneServerPerSuite
@@ -40,6 +40,7 @@ trait BaseIntegrationSpec
     with DefaultAwaitTimeout
     with WiremockHelper
     with CommonStubs
+    with InjectorSupport
     with TestData {
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -81,7 +82,7 @@ trait BaseIntegrationSpec
     super.beforeEach()
   }
 
-  implicit val mat: Materializer                  = app.injector.instanceOf[Materializer]
-  implicit val ws: WSClient                       = app.injector.instanceOf[WSClient]
-  implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
+  implicit val mat: Materializer                  = inject[Materializer]
+  implicit val ws: WSClient                       = inject[WSClient]
+  implicit val executionContext: ExecutionContext = inject[ExecutionContext]
 }

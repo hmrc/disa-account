@@ -20,7 +20,8 @@ import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module => AppModule}
 
 import java.time.Clock
-import uk.gov.hmrc.disaaccount.config.{InternalAuthTokenInitialiser, InternalAuthTokenInitialiserImpl, NoOpInternalAuthTokenInitialiser}
+import uk.gov.hmrc.disaaccount.config.*
+import uk.gov.hmrc.disaaccount.controllers.actions.*
 
 class Module extends AppModule {
 
@@ -33,6 +34,13 @@ class Module extends AppModule {
     } else {
       bind[InternalAuthTokenInitialiser].to[NoOpInternalAuthTokenInitialiser]
     }
-    Seq(bind[Clock].toInstance(Clock.systemDefaultZone), bind[AppInitialiser].toSelf.eagerly(), initialiser)
+    Seq(
+      bind[Clock].toInstance(Clock.systemDefaultZone),
+      bind[AppInitialiser].toSelf.eagerly(),
+      bind[AgentAuthAction].to[AgentAuthActionImpl],
+      bind[AgentPreferencesGetAction].to[AgentPreferencesGetActionImpl],
+      bind[AgentPreferencesSetAction].to[AgentPreferencesSetActionImpl],
+      initialiser
+    )
   }
 }

@@ -1,0 +1,20 @@
+meta {
+  name: 03-200-get-saved
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+}
+
+assert {
+  res.status: 200
+  res.body.zReference: eq {{zReference}}
+}

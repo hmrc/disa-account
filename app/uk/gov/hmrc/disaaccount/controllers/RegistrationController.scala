@@ -19,7 +19,7 @@ package uk.gov.hmrc.disaaccount.controllers
 import play.api.Logging
 import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.*
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 import uk.gov.hmrc.disaaccount.connectors.EtmpConnector
 import uk.gov.hmrc.disaaccount.models.registrationDetails.UpdateRegistrationDetailsRequest

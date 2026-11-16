@@ -16,23 +16,23 @@
 
 package config
 
-import utils.BaseUnitSpec
+import utils.UnitSpecBase
 import uk.gov.hmrc.disaaccount.config.{AppConfig, InternalAuthTokenInitialiserImpl}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.pekko.Done
 import org.apache.pekko.actor.ActorSystem
 import org.mockito.ArgumentMatchers.{any, eq as eqTo}
-import org.mockito.Mockito.{never, times, verify, when}
-import play.api.http.Status.{BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND, OK, UNAUTHORIZED}
+import org.mockito.Mockito.*
+import play.api.http.Status.*
 import play.api.libs.concurrent.Futures
 import play.api.libs.json.{JsObject, Json}
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import uk.gov.hmrc.http.{BadGatewayException, GatewayTimeoutException, HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.*
 
 import scala.concurrent.Future
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
-class InternalAuthTokenInitialiserImplSpec extends BaseUnitSpec {
+class InternalAuthTokenInitialiserImplSpec extends UnitSpecBase {
 
   private val internalAuthToken          = "valid-disa-account-local-client-token"
   private val appName                    = "agent-client-relationships"
@@ -69,7 +69,7 @@ class InternalAuthTokenInitialiserImplSpec extends BaseUnitSpec {
 
     lazy val initialiser =
       new InternalAuthTokenInitialiserImpl(
-        app.injector.instanceOf[ActorSystem],
+        inject[ActorSystem],
         mockAppConfig,
         startupRetryConfig,
         mockHttpClient,
@@ -234,6 +234,16 @@ class InternalAuthTokenInitialiserImplSpec extends BaseUnitSpec {
         val error = initialiser.initialised.failed.futureValue
         error                                                shouldBe a[UpstreamErrorResponse]
         error.asInstanceOf[UpstreamErrorResponse].statusCode shouldBe INTERNAL_SERVER_ERROR
+        verify(mockGetRequestBuilder, times(callAmountWithRetries)).execute[HttpResponse](any(), any())
+        verify(mockHttpClient, never()).post(any())(any())
+      }
+
+      "retry unexpected token check responses without creating a token" in new TestSetup {
+        authTokenIsValidResponse(FORBIDDEN)
+
+        val error = initialiser.initialised.failed.futureValue
+        error                                                shouldBe a[UpstreamErrorResponse]
+        error.asInstanceOf[UpstreamErrorResponse].statusCode shouldBe FORBIDDEN
         verify(mockGetRequestBuilder, times(callAmountWithRetries)).execute[HttpResponse](any(), any())
         verify(mockHttpClient, never()).post(any())(any())
       }

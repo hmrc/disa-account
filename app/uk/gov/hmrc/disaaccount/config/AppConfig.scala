@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.disaaccount.config
 
+import java.time.Duration
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -23,6 +24,8 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig) {
   val appName: String = config.get[String]("appName")
+
+  lazy val agentPreferencesTtl: Duration = config.get[Duration]("agent-preferences.ttl")
 
   lazy val internalAuthService: String   = servicesConfig.baseUrl("internal-auth")
   lazy val internalAuthToken: String     = config.get[String]("internal-auth.local-client-token")

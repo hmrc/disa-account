@@ -1,0 +1,25 @@
+meta {
+  name: 06-401-put-unauthenticated
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": "{{zReference}}"
+  }
+}
+
+assert {
+  res.status: 401
+}

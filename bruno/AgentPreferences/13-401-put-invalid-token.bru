@@ -1,0 +1,26 @@
+meta {
+  name: 13-401-put-invalid-token
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: invalid-local-token
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": "{{zReference}}"
+  }
+}
+
+assert {
+  res.status: 401
+}

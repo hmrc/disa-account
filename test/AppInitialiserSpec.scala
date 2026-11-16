@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount
-
 import org.apache.pekko.Done
 import play.api.Logger
-import uk.gov.hmrc.disaaccount.config.{InternalAuthTokenInitialiser, NoOpInternalAuthTokenInitialiser}
+import uk.gov.hmrc.disaaccount.AppInitialiser
+import uk.gov.hmrc.disaaccount.config.*
 import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
-import utils.BaseUnitSpec
+import utils.UnitSpecBase
+
 import scala.concurrent.Future
 
-class AppInitialiserSpec extends BaseUnitSpec with LogCapturing {
+class AppInitialiserSpec extends UnitSpecBase with LogCapturing {
   private def initialiser(result: Future[Done]) = new InternalAuthTokenInitialiser {
     override protected def initialise(): Future[Done] = result
   }
 
   "AppInitialiser" should {
     "complete eagerly using the no-op binding without contacting internal-auth" in {
-      app.injector.instanceOf[InternalAuthTokenInitialiser]           shouldBe a[NoOpInternalAuthTokenInitialiser]
-      app.injector.instanceOf[AppInitialiser].initialised.futureValue shouldBe Done
+      inject[InternalAuthTokenInitialiser]           shouldBe a[NoOpInternalAuthTokenInitialiser]
+      inject[AppInitialiser].initialised.futureValue shouldBe Done
     }
     "log successful initialisation" in
       withCaptureOfLoggingFrom(Logger(classOf[AppInitialiser])) { events =>

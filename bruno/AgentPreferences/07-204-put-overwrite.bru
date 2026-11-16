@@ -1,0 +1,26 @@
+meta {
+  name: 07-204-put-overwrite
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": "{{alternateZReference}}"
+  }
+}
+
+assert {
+  res.status: 204
+}

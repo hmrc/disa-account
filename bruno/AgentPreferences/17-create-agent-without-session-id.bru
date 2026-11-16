@@ -1,0 +1,43 @@
+meta {
+  name: 17-create-agent-without-session-id
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{authLoginBaseUrl}}/government-gateway/session/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "credId": "no-session-{{credId}}",
+    "affinityGroup": "Agent",
+    "credentialStrength": "strong",
+    "credentialRole": "admin",
+    "enrolments": [
+      {
+        "key": "HMRC-AS-AGENT",
+        "identifiers": [{"key": "AgentReferenceNumber", "value": "TARN0000001"}],
+        "state": "Activated"
+      }
+    ]
+  }
+}
+
+script:post-response {
+  const authorisation = res.getHeader("Authorization");
+  if (!authorisation) {
+    throw new Error("auth-login-api did not return an Authorization header");
+  }
+  bru.setVar("agentWithoutSessionIdAuthorisation", authorisation);
+}
+
+assert {
+  res.status: 201
+}

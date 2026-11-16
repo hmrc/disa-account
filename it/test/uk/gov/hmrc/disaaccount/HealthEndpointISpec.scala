@@ -25,10 +25,10 @@ import play.api.http.Status.OK
 import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, StringContextOps}
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
-class HealthEndpointIntegrationSpec
+class HealthEndpointISpec
     extends AnyWordSpec
     with Matchers
     with ScalaFutures

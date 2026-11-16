@@ -1,0 +1,21 @@
+meta {
+  name: 01-404-get-unset
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+}
+
+assert {
+  res.status: 404
+  res.body.code: AGENT_PREFERENCES_NOT_FOUND
+  res.body.message: eq Agent preferences were not found for session ID: bruno-{{credId}}
+}

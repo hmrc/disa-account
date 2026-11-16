@@ -19,10 +19,10 @@ package uk.gov.hmrc.disaaccount.controllers
 import play.api.http.Status._
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
-import uk.gov.hmrc.disaaccount.utils.BaseIntegrationSpec
+import uk.gov.hmrc.disaaccount.utils.IntegrationSpecBase
 import uk.gov.hmrc.disaaccount.utils.WiremockHelper.stubGet
 
-class RegistrationControllerISpec extends BaseIntegrationSpec {
+class RegistrationControllerISpec extends IntegrationSpecBase {
 
   val etmpRegistrationUrl: String = s"/etmp/registration/$testZref"
 

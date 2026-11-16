@@ -1,0 +1,24 @@
+meta {
+  name: 09-400-put-malformed-json
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  invalid-json
+}
+
+assert {
+  res.status: 400
+}

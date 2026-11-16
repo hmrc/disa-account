@@ -1,0 +1,20 @@
+meta {
+  name: 21-403-get-delegated-denied
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+}
+
+assert {
+  res.status: 403
+  res.body.code: AGENT_CLIENT_RELATIONSHIP_NOT_ESTABLISHED
+}
