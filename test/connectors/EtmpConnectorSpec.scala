@@ -24,20 +24,21 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.disaaccount.models.registrationDetails.{RegistrationDetails, UpdateRegistrationDetailsRequest}
 import uk.gov.hmrc.disaaccount.models.registrationDetails.isaProducts.IsaProducts
-import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
-import utils.BaseUnitSpec
+import uk.gov.hmrc.http.*
+import utils.UnitSpecBase
 
 import scala.concurrent.Future
 
-class EtmpConnectorSpec extends BaseUnitSpec {
+class EtmpConnectorSpec extends UnitSpecBase {
 
   trait TestSetup {
     val connector: EtmpConnector = new EtmpConnector(mockHttpClient, mockAppConfig, retryConfig, actorSystem)
 
     val testUrl: String = "http://localhost:1201"
+    val registrationUrl = url"$testUrl/etmp/registration/$testZref"
     when(mockAppConfig.etmpBaseUrl).thenReturn(testUrl)
 
-    when(mockHttpClient.get(url"$testUrl/etmp/registration/$testZref"))
+    when(mockHttpClient.get(registrationUrl))
       .thenReturn(mockRequestBuilder)
   }
 
@@ -107,7 +108,7 @@ class EtmpConnectorSpec extends BaseUnitSpec {
   "EtmpConnector.updateRegistrationDetails" should {
     "send the typed request and return Right when the call succeeds" in new TestSetup {
       val details = UpdateRegistrationDetailsRequest(tradingName = Some("Updated name"))
-      when(mockHttpClient.put(url"$testUrl/etmp/registration/$testZref")).thenReturn(mockRequestBuilder)
+      when(mockHttpClient.put(registrationUrl)).thenReturn(mockRequestBuilder)
       when(mockRequestBuilder.withBody(Json.toJson(details))).thenReturn(mockRequestBuilder)
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(HttpResponse(OK, ""))))
@@ -120,7 +121,7 @@ class EtmpConnectorSpec extends BaseUnitSpec {
     "return Left when ETMP cannot find the registration" in new TestSetup {
       val details  = UpdateRegistrationDetailsRequest()
       val notFound = UpstreamErrorResponse("Not found", NOT_FOUND, NOT_FOUND, Map.empty)
-      when(mockHttpClient.put(url"$testUrl/etmp/registration/$testZref")).thenReturn(mockRequestBuilder)
+      when(mockHttpClient.put(registrationUrl)).thenReturn(mockRequestBuilder)
       when(mockRequestBuilder.withBody(Json.toJson(details))).thenReturn(mockRequestBuilder)
       when(mockRequestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Left(notFound)))

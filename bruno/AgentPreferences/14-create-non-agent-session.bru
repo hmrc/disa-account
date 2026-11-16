@@ -1,0 +1,41 @@
+meta {
+  name: 14-create-non-agent-session
+  type: http
+  seq: 15
+}
+
+post {
+  url: {{authLoginBaseUrl}}/government-gateway/session/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "credId": "non-agent-{{credId}}",
+    "affinityGroup": "Individual",
+    "credentialStrength": "strong",
+    "credentialRole": "admin",
+    "enrolments": [],
+    "mdtpInformation": {
+      "deviceId": "bruno-device",
+      "sessionId": "bruno-non-agent-{{credId}}"
+    }
+  }
+}
+
+script:post-response {
+  const authorisation = res.getHeader("Authorization");
+  if (!authorisation) {
+    throw new Error("auth-login-api did not return an Authorization header");
+  }
+  bru.setVar("nonAgentAuthorisation", authorisation);
+}
+
+assert {
+  res.status: 201
+}

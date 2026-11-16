@@ -1,0 +1,27 @@
+meta {
+  name: 19-403-put-without-session-id
+  type: http
+  seq: 20
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{agentWithoutSessionIdAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": "{{zReference}}"
+  }
+}
+
+assert {
+  res.status: 403
+  res.body.code: SESSION_ID_NOT_AVAILABLE
+}

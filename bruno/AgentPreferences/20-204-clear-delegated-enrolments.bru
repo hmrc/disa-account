@@ -1,0 +1,24 @@
+meta {
+  name: 20-204-clear-delegated-enrolments
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{authBaseUrl}}/auth/delegated-enrolments
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  []
+}
+
+assert {
+  res.status: 204
+}

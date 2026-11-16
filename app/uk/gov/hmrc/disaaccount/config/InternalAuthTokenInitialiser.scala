@@ -20,13 +20,13 @@ import com.typesafe.config.Config
 import org.apache.pekko.Done
 import org.apache.pekko.actor.ActorSystem
 import play.api.Logging
-import play.api.http.Status.{CREATED, NOT_FOUND, OK, UNAUTHORIZED}
+import play.api.http.Status.*
 import play.api.libs.concurrent.Futures
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.http.HttpReads.Implicits.{readEitherOf, readRaw}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{BadGatewayException, GatewayTimeoutException, HeaderCarrier, HttpResponse, Retries, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.*
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration.DurationInt

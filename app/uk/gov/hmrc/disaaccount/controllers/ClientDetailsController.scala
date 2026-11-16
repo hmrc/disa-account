@@ -18,9 +18,10 @@ package uk.gov.hmrc.disaaccount.controllers
 
 import play.api.Logging
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.*
 import uk.gov.hmrc.disaaccount.connectors.EtmpConnector
 import uk.gov.hmrc.disaaccount.models.ClientDetails
+import uk.gov.hmrc.disaaccount.utils.Constants.errorMessageField
 import uk.gov.hmrc.disaaccount.validators.ZReferenceValidator
 import uk.gov.hmrc.internalauth.client.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -39,7 +40,7 @@ class ClientDetailsController @Inject() (
 
   def get(zref: String): Action[AnyContent] = auth.authorizedAction(readPermission).async { implicit request =>
     if (!ZReferenceValidator.isValid(zref))
-      Future.successful(BadRequest(Json.obj("message" -> ClientDetailsErrors.invalidZRef)))
+      Future.successful(BadRequest(Json.obj(errorMessageField -> ClientDetailsErrors.invalidZRef)))
     else
       etmpConnector
         .getRegistrationDetails(zref)
@@ -54,17 +55,17 @@ class ClientDetailsController @Inject() (
                 logger.error(
                   s"[ClientDetailsController][get] Incomplete ETMP client details; missing fields: ${missing.mkString(", ")}"
                 )
-                InternalServerError(Json.obj("message" -> ClientDetailsErrors.missingClientDetails))
+                InternalServerError(Json.obj(errorMessageField -> ClientDetailsErrors.missingClientDetails))
             }
           case Left(error) if error.statusCode == NOT_FOUND =>
-            NotFound(Json.obj("message" -> ClientDetailsErrors.clientNotFound))
+            NotFound(Json.obj(errorMessageField -> ClientDetailsErrors.clientNotFound))
           case Left(error)                                  =>
             logger.error(s"[ClientDetailsController][get] ETMP lookup failed; status: ${error.statusCode}")
-            InternalServerError(Json.obj("message" -> ClientDetailsErrors.lookupFailed))
+            InternalServerError(Json.obj(errorMessageField -> ClientDetailsErrors.lookupFailed))
         }
         .recover { case NonFatal(error) =>
           logger.error(s"[ClientDetailsController][get] ETMP lookup failed; exception: ${error.getClass.getSimpleName}")
-          InternalServerError(Json.obj("message" -> ClientDetailsErrors.lookupFailed))
+          InternalServerError(Json.obj(errorMessageField -> ClientDetailsErrors.lookupFailed))
         }
   }
 

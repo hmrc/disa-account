@@ -1,0 +1,19 @@
+meta {
+  name: 12-401-get-invalid-token
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: invalid-local-token
+}
+
+assert {
+  res.status: 401
+}

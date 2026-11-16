@@ -21,16 +21,17 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
 import scala.concurrent.duration.DurationInt
 import play.api.Logger
 import play.api.http.Status.*
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.*
 import play.api.test.Helpers.await
-import uk.gov.hmrc.disaaccount.utils.BaseIntegrationSpec
+import uk.gov.hmrc.disaaccount.utils.IntegrationSpecBase
+import uk.gov.hmrc.disaaccount.utils.Constants.errorMessageField
 import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 
-class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing {
+class ClientDetailsControllerISpec extends IntegrationSpecBase with LogCapturing {
   override def config: Map[String, Any] = super.config ++ Map("play.ws.timeout.request" -> "500ms")
 
   private val token            = "client-details-test-token"
-  private val etmpUrl          = "/etmp/registration/Z1234"
+  private val etmpUrl          = s"/etmp/registration/$testZref"
   private val complete         = Json.toJson(testJourneyData).as[JsObject]
   private val controllerLogger = Logger(classOf[ClientDetailsController])
 
@@ -56,7 +57,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
       )
     )
 
-  private def request(zref: String = "Z1234", credentials: Option[String] = Some(token)) = {
+  private def request(zref: String = testZref, credentials: Option[String] = Some(token)) = {
     val call = ws.url(s"http://localhost:$port/disa-account/client-details/$zref").withRequestTimeout(10.seconds)
     await(credentials.fold(call)(value => call.withHttpHeaders("Authorization" -> value)).get())
   }
@@ -83,7 +84,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
         authorise()
         val response = request(zref)
         response.status shouldBe BAD_REQUEST
-        response.json   shouldBe Json.obj("message" -> "Invalid Z-Ref: expected Z followed by four digits")
+        response.json   shouldBe Json.obj(errorMessageField -> "Invalid Z-Ref: expected Z followed by four digits")
         verify(0, getRequestedFor(urlPathMatching("/etmp/.*")))
       }
     }
@@ -93,7 +94,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
       etmp(status = NOT_FOUND)
       val response = request()
       response.status shouldBe NOT_FOUND
-      response.json   shouldBe Json.obj("message" -> "Client not found in ETMP")
+      response.json   shouldBe Json.obj(errorMessageField -> "Client not found in ETMP")
       verify(1, getRequestedFor(urlEqualTo(etmpUrl)))
     }
 
@@ -122,7 +123,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
         withCaptureOfLoggingFrom(controllerLogger) { events =>
           val response = request()
           response.status                                                        shouldBe INTERNAL_SERVER_ERROR
-          response.json                                                          shouldBe Json.obj("message" -> "Required client details are missing")
+          response.json                                                          shouldBe Json.obj(errorMessageField -> "Required client details are missing")
           events.exists(_.getMessage.contains("Incomplete ETMP client details")) shouldBe true
           events.exists(_.getMessage.contains("123456"))                         shouldBe false
         }
@@ -149,7 +150,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
         withCaptureOfLoggingFrom(controllerLogger) { events =>
           val response = request()
           response.status                                            shouldBe INTERNAL_SERVER_ERROR
-          response.json                                              shouldBe Json.obj("message" -> "Error retrieving client details from ETMP")
+          response.json                                              shouldBe Json.obj(errorMessageField -> "Error retrieving client details from ETMP")
           events.exists(_.getMessage.contains("ETMP lookup failed")) shouldBe true
         }
         verify(if (status >= 500) 4 else 1, getRequestedFor(urlEqualTo(etmpUrl)))
@@ -181,7 +182,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
       withCaptureOfLoggingFrom(controllerLogger) { events =>
         val response = request()
         response.status                                              shouldBe INTERNAL_SERVER_ERROR
-        response.json                                                shouldBe Json.obj("message" -> "Error retrieving client details from ETMP")
+        response.json                                                shouldBe Json.obj(errorMessageField -> "Error retrieving client details from ETMP")
         events.exists(_.getMessage.contains("ETMP lookup failed"))   shouldBe true
         events.exists(_.getMessage.contains("private-invalid-json")) shouldBe false
       }
@@ -198,7 +199,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
       withCaptureOfLoggingFrom(controllerLogger) { events =>
         val response = request()
         response.status                                            shouldBe INTERNAL_SERVER_ERROR
-        response.json                                              shouldBe Json.obj("message" -> "Error retrieving client details from ETMP")
+        response.json                                              shouldBe Json.obj(errorMessageField -> "Error retrieving client details from ETMP")
         events.exists(_.getMessage.contains("ETMP lookup failed")) shouldBe true
       }
     }
@@ -209,7 +210,7 @@ class ClientDetailsControllerISpec extends BaseIntegrationSpec with LogCapturing
       withCaptureOfLoggingFrom(controllerLogger) { events =>
         val response = request()
         response.status                                            shouldBe INTERNAL_SERVER_ERROR
-        response.json                                              shouldBe Json.obj("message" -> "Error retrieving client details from ETMP")
+        response.json                                              shouldBe Json.obj(errorMessageField -> "Error retrieving client details from ETMP")
         events.exists(_.getMessage.contains("ETMP lookup failed")) shouldBe true
       }
     }

@@ -20,13 +20,13 @@ import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.libs.json.Json
 import play.api.test.Helpers.await
 import uk.gov.hmrc.disaaccount.models.registrationDetails.RegistrationDetails
-import uk.gov.hmrc.disaaccount.utils.BaseIntegrationSpec
+import uk.gov.hmrc.disaaccount.utils.IntegrationSpecBase
 import uk.gov.hmrc.disaaccount.utils.WiremockHelper.stubGet
 import uk.gov.hmrc.http.JsValidationException
 
-class EtmpConnectorISpec extends BaseIntegrationSpec {
+class EtmpConnectorISpec extends IntegrationSpecBase {
 
-  val connector: EtmpConnector = app.injector.instanceOf[EtmpConnector]
+  val connector: EtmpConnector = inject[EtmpConnector]
 
   val registrationUrl: String = s"/etmp/registration/$testZref"
 

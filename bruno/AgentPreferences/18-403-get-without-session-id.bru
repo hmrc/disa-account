@@ -1,0 +1,20 @@
+meta {
+  name: 18-403-get-without-session-id
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{agentWithoutSessionIdAuthorisation}}
+}
+
+assert {
+  res.status: 403
+  res.body.code: SESSION_ID_NOT_AVAILABLE
+}

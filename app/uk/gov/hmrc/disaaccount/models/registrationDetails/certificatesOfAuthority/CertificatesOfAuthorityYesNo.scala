@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesofauthority
+package uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesOfAuthority
 
 import uk.gov.hmrc.disaaccount.models.{Enumerable, WithName}
 

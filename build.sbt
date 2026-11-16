@@ -16,6 +16,10 @@ lazy val microservice = Project("disa-account", file("."))
   .settings(CodeCoverageSettings.settings: _*)
   .settings(PlayKeys.playDefaultPort := 12105)
 
+Test / javaOptions += "-Dlogger.resource=logback-test.xml"
+Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat
+Test / fork := true
+
 lazy val it = project
   .enablePlugins(PlayScala)
   .dependsOn(microservice % "test->test")
@@ -24,4 +28,7 @@ lazy val it = project
 
 addCommandAlias("prePrChecks", ";scalafmtCheckAll;scalafmtSbtCheck")
 
-addCommandAlias("precommit", ";scalafmtAll;test:scalafmtAll;it/test:scalafmtAll;coverage;test;it/test;coverageReport")
+addCommandAlias(
+  "precommit",
+  ";scalafmtAll;Test / scalafmtAll;it / Test / scalafmtAll;coverage;test;it/test;coverageReport"
+)

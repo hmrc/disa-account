@@ -4,3 +4,6 @@ GET     /registration/:zref    uk.gov.hmrc.disaaccount.controllers.RegistrationC
 PUT     /registration/:zref    uk.gov.hmrc.disaaccount.controllers.RegistrationController.updateRegistrationDetails(zref: String)
 
 GET     /client-details/:zref  uk.gov.hmrc.disaaccount.controllers.ClientDetailsController.get(zref: String)
+
+GET     /agents/preferences    uk.gov.hmrc.disaaccount.controllers.AgentPreferencesController.getAgentPreferences()
+PUT     /agents/preferences    uk.gov.hmrc.disaaccount.controllers.AgentPreferencesController.setAgentPreferences()

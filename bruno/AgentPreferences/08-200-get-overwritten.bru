@@ -1,0 +1,20 @@
+meta {
+  name: 08-200-get-overwritten
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+}
+
+assert {
+  res.status: 200
+  res.body.zReference: eq {{alternateZReference}}
+}

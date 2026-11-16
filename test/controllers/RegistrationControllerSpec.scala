@@ -25,13 +25,13 @@ import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.disaaccount.controllers.RegistrationController
 import uk.gov.hmrc.disaaccount.models.registrationDetails.UpdateRegistrationDetailsRequest
 import uk.gov.hmrc.http.UpstreamErrorResponse
-import utils.BaseUnitSpec
+import utils.UnitSpecBase
 
 import scala.concurrent.Future
 
-class RegistrationControllerSpec extends BaseUnitSpec {
+class RegistrationControllerSpec extends UnitSpecBase {
 
-  val controller: RegistrationController = app.injector.instanceOf[RegistrationController]
+  val controller: RegistrationController = inject[RegistrationController]
 
   def authorisedUser(): Unit =
     when(mockAuthConnector.authorise(any, any[Retrieval[Unit]])(any, any))

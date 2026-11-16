@@ -12,7 +12,10 @@ resource type `disa-account`, location `client-details`, action `READ`.
 Z-Refs must match `^Z[0-9]{4}$`.
 
 ```json
-{"businessName":"Test Isa Manager Ltd","fcaNumber":"123456"}
+{
+  "businessName":"Test Isa Manager Ltd",
+  "fcaNumber":"123456"
+}
 ```
 
 Application-generated errors use JSON with a `message` field:
@@ -25,6 +28,41 @@ Application-generated errors use JSON with a `message` field:
 | 500 | The ETMP lookup fails, times out or returns an invalid response. | `Error retrieving client details from ETMP` |
 
 Internal-auth supplies its standard authentication/permission failure responses (401/403).
+
+### Agent preferences
+
+`GET /disa-account/agents/preferences` and `PUT /disa-account/agents/preferences` require the
+frontend user's bearer token. Both require the `Agent` affinity group and an active
+`HMRC-AS-AGENT` enrolment. The session ID is obtained from the authenticated user's
+`mdtpInformation` in Auth. Callers do not supply a session ID in the path or a header.
+
+PUT accepts the following JSON, validates the Z-Ref using `^Z[0-9]{4}$`, checks access with Auth,
+and returns `204 No Content`:
+
+```json
+{
+  "zReference":"Z1234"
+}
+```
+
+GET returns the same JSON after checking access with Auth. The first PUT for a session sets
+its expiry (`agent-preferences.ttl`, four hours by default). Later PUTs replace the choice
+without extending that expiry. GET will not return an expired choice, even if MongoDB has
+not yet removed it. GET does not extend the expiry.
+
+The reason is it four hours by default is due to an auth session lasting four hours maximum. The preferences will never 
+expire before the auth session does.
+
+| Status | Code | Context |
+| --- | --- | --- |
+| 400 | `INVALID_ZREFERENCE_FORMAT` | The PUT body is malformed or does not contain a valid Z-Ref. |
+| 403 | `USER_IS_NOT_AN_AGENT` | The user lacks agent affinity or the active agent enrolment. |
+| 403 | `SESSION_ID_NOT_AVAILABLE` | Auth does not provide a usable session ID. |
+| 403 | `AGENT_CLIENT_RELATIONSHIP_NOT_ESTABLISHED` | Auth denied access to the DISA Z-Ref. |
+| 404 | `AGENT_PREFERENCES_NOT_FOUND` | No unexpired preference exists for the session. |
+
+Missing or invalid bearer tokens return 401. Delegated access uses Auth's `HMRC-DISA-ORG`
+enrolment with identifier `ZREF` and rule `disa-auth`.
 
 ## Running the app
 

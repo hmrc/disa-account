@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.disaaccount.models.registrationDetails
 
-import play.api.libs.json.{Format, Json, Reads, Writes}
-import uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesofauthority.CertificatesOfAuthority
+import play.api.libs.json.*
+import uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesOfAuthority.CertificatesOfAuthority
 import uk.gov.hmrc.disaaccount.models.registrationDetails.isaProducts.IsaProducts
 import uk.gov.hmrc.disaaccount.models.registrationDetails.liaisonofficers.LiaisonOfficers
 import uk.gov.hmrc.disaaccount.models.registrationDetails.orgdetails.OrganisationDetails

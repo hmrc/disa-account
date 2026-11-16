@@ -1,0 +1,27 @@
+meta {
+  name: 16-403-put-non-agent
+  type: http
+  seq: 17
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{nonAgentAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": "{{zReference}}"
+  }
+}
+
+assert {
+  res.status: 403
+  res.body.code: USER_IS_NOT_AN_AGENT
+}

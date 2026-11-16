@@ -1,0 +1,27 @@
+meta {
+  name: 22-403-put-delegated-denied
+  type: http
+  seq: 23
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": "{{zReference}}"
+  }
+}
+
+assert {
+  res.status: 403
+  res.body.code: AGENT_CLIENT_RELATIONSHIP_NOT_ESTABLISHED
+}

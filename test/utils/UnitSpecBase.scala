@@ -19,7 +19,7 @@ package utils
 import com.typesafe.config.Config
 import org.apache.pekko.actor.ActorSystem
 import org.mockito.Mockito
-import org.scalatest._
+import org.scalatest.*
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -32,13 +32,14 @@ import play.api.test.DefaultAwaitTimeout
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.disaaccount.config.AppConfig
 import uk.gov.hmrc.disaaccount.connectors.EtmpConnector
+import uk.gov.hmrc.disaaccount.repositories.AgentPreferencesRepository
+import uk.gov.hmrc.disaaccount.services.AgentPreferencesService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
-import utils.TestData
 
 import scala.concurrent.ExecutionContext
 
-abstract class BaseUnitSpec
+abstract class UnitSpecBase
     extends AnyWordSpec
     with Matchers
     with BeforeAndAfterEach
@@ -47,7 +48,8 @@ abstract class BaseUnitSpec
     with MockitoSugar
     with DefaultAwaitTimeout
     with GuiceOneAppPerSuite
-    with TestData {
+    with InjectorSupport
+    with utils.TestData {
 
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val hc: HeaderCarrier    = HeaderCarrier()
@@ -55,14 +57,24 @@ abstract class BaseUnitSpec
   lazy val retryConfig: Config      = app.configuration.underlying
   lazy val actorSystem: ActorSystem = app.actorSystem
 
-  val mockHttpClient: HttpClientV2       = mock[HttpClientV2]
-  val mockAppConfig: AppConfig           = mock[AppConfig]
-  val mockRequestBuilder: RequestBuilder = mock[RequestBuilder]
-  val mockAuthConnector: AuthConnector   = mock[AuthConnector]
-  val mockEtmpConnector: EtmpConnector   = mock[EtmpConnector]
+  val mockHttpClient: HttpClientV2                               = mock[HttpClientV2]
+  val mockAppConfig: AppConfig                                   = mock[AppConfig]
+  val mockRequestBuilder: RequestBuilder                         = mock[RequestBuilder]
+  val mockAuthConnector: AuthConnector                           = mock[AuthConnector]
+  val mockEtmpConnector: EtmpConnector                           = mock[EtmpConnector]
+  val mockAgentPreferencesRepository: AgentPreferencesRepository = mock[AgentPreferencesRepository]
+  val mockAgentPreferencesService: AgentPreferencesService       = mock[AgentPreferencesService]
 
   override def beforeEach(): Unit =
-    Mockito.reset(mockHttpClient, mockAppConfig, mockRequestBuilder, mockAuthConnector, mockEtmpConnector)
+    Mockito.reset(
+      mockHttpClient,
+      mockAppConfig,
+      mockRequestBuilder,
+      mockAuthConnector,
+      mockEtmpConnector,
+      mockAgentPreferencesRepository,
+      mockAgentPreferencesService
+    )
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .configure("create-internal-auth-token-on-start" -> false)
@@ -70,7 +82,9 @@ abstract class BaseUnitSpec
     .overrides(
       bind[AuthConnector].toInstance(mockAuthConnector),
       bind[AppConfig].toInstance(mockAppConfig),
-      bind[EtmpConnector].toInstance(mockEtmpConnector)
+      bind[EtmpConnector].toInstance(mockEtmpConnector),
+      bind[AgentPreferencesRepository].toInstance(mockAgentPreferencesRepository),
+      bind[AgentPreferencesService].toInstance(mockAgentPreferencesService)
     )
     .build()
 }

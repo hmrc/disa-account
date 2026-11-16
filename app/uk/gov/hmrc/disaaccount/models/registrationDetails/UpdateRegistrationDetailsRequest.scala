@@ -17,7 +17,7 @@
 package uk.gov.hmrc.disaaccount.models.registrationDetails
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesofauthority.{FcaArticles, FinancialOrganisation}
+import uk.gov.hmrc.disaaccount.models.registrationDetails.certificatesOfAuthority.{FcaArticles, FinancialOrganisation}
 import uk.gov.hmrc.disaaccount.models.registrationDetails.isaProducts.{InnovativeFinancialProduct, IsaProduct}
 import uk.gov.hmrc.disaaccount.models.registrationDetails.liaisonofficers.LiaisonOfficers
 import uk.gov.hmrc.disaaccount.models.registrationDetails.signatories.Signatories

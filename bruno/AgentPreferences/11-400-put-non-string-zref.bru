@@ -1,0 +1,27 @@
+meta {
+  name: 11-400-put-non-string-zref
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{baseUrl}}/disa-account/agents/preferences
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: {{agentAuthorisation}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "zReference": 1234
+  }
+}
+
+assert {
+  res.status: 400
+  res.body.code: INVALID_ZREFERENCE_FORMAT
+}
