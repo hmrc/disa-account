@@ -50,6 +50,9 @@ its expiry (`agent-preferences.ttl`, four hours by default). Later PUTs replace 
 without extending that expiry. GET will not return an expired choice, even if MongoDB has
 not yet removed it. GET does not extend the expiry.
 
+The reason is it four hours by default is due to an auth session lasting four hours maximum. The preferences will never 
+expire before the auth session does.
+
 | Status | Code | Context |
 | --- | --- | --- |
 | 400 | `INVALID_ZREFERENCE_FORMAT` | The PUT body is malformed or does not contain a valid Z-Ref. |
