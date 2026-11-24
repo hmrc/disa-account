@@ -1,0 +1,21 @@
+meta {
+  name: 08-401-individual
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z1234
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 401
+  res.body.code: USER_IS_NOT_AN_ORGANISATION
+  res.body.message: User is not an Organisation
+}

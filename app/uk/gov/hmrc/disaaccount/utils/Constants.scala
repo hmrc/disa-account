@@ -25,6 +25,15 @@ object Constants {
   val errorCodeField    = "code"
   val errorMessageField = "message"
 
+  val unauthorizedCode               = "UNAUTHORIZED"
+  val unauthorizedMessage            = "Authentication is required"
+  val userIsNotAnOrganisationCode    = "USER_IS_NOT_AN_ORGANISATION"
+  val userIsNotAnOrganisationMessage = "User is not an Organisation"
+  val disaEnrolmentNotFoundCode      = "DISA_ENROLMENT_NOT_FOUND"
+  val disaEnrolmentNotFoundMessage   = "An active DISA enrolment matching the requested Z-Reference is required"
+  val clientDetailsNotFoundCode      = "CLIENT_DETAILS_NOT_FOUND"
+  val clientDetailsNotFoundMessage   = "Client details were not found"
+
   val agentClientRelationshipNotEstablishedCode    = "AGENT_CLIENT_RELATIONSHIP_NOT_ESTABLISHED"
   val agentClientRelationshipNotEstablishedMessage = "Agent to client relationship not established"
   val agentPreferencesNotFoundCode                 = "AGENT_PREFERENCES_NOT_FOUND"

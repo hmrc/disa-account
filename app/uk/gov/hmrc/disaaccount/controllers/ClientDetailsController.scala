@@ -20,8 +20,10 @@ import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.*
 import uk.gov.hmrc.disaaccount.connectors.EtmpConnector
-import uk.gov.hmrc.disaaccount.models.ClientDetails
-import uk.gov.hmrc.disaaccount.utils.Constants.errorMessageField
+import uk.gov.hmrc.disaaccount.controllers.actions.BtaAuthAction
+import uk.gov.hmrc.disaaccount.models.{ClientDetails, ErrorResponse}
+import uk.gov.hmrc.disaaccount.models.responses.BtaClientDetailsResponse
+import uk.gov.hmrc.disaaccount.utils.Constants.*
 import uk.gov.hmrc.disaaccount.validators.ZReferenceValidator
 import uk.gov.hmrc.internalauth.client.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -33,10 +35,31 @@ import scala.util.control.NonFatal
 class ClientDetailsController @Inject() (
   cc: ControllerComponents,
   etmpConnector: EtmpConnector,
-  auth: BackendAuthComponents
+  auth: BackendAuthComponents,
+  btaAuth: BtaAuthAction
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
+
+  def bta(zReference: String): Action[AnyContent] = btaAuth(zReference).async { implicit request =>
+    etmpConnector
+      .getRegistrationDetails(zReference)
+      .map {
+        case Right(details)                                         => Ok(Json.toJson(BtaClientDetailsResponse.from(details)))
+        case Left(error) if error.statusCode == NOT_FOUND           =>
+          NotFound(Json.toJson(ErrorResponse(clientDetailsNotFoundCode, clientDetailsNotFoundMessage)))
+        case Left(error) if error.statusCode == SERVICE_UNAVAILABLE =>
+          logger.warn("[ClientDetailsController][bta] ETMP lookup failed; status: 503")
+          ServiceUnavailable(Json.toJson(ErrorResponse(serviceUnavailableCode, serviceUnavailableMessage)))
+        case Left(error)                                            =>
+          logger.error(s"[ClientDetailsController][bta] ETMP lookup failed; status: ${error.statusCode}")
+          InternalServerError(Json.toJson(ErrorResponse(internalServerErrorCode, internalServerErrorMessage)))
+      }
+      .recover { case NonFatal(error) =>
+        logger.error(s"[ClientDetailsController][bta] ETMP lookup failed; exception: ${error.getClass.getSimpleName}")
+        InternalServerError(Json.toJson(ErrorResponse(internalServerErrorCode, internalServerErrorMessage)))
+      }
+  }
 
   def get(zref: String): Action[AnyContent] = auth.authorizedAction(readPermission).async { implicit request =>
     if (!ZReferenceValidator.isValid(zref))

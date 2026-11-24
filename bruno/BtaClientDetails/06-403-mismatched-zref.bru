@@ -1,0 +1,21 @@
+meta {
+  name: 06-403-mismatched-zref
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z5678
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 403
+  res.body.code: DISA_ENROLMENT_NOT_FOUND
+  res.body.message: An active DISA enrolment matching the requested Z-Reference is required
+}

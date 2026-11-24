@@ -1,0 +1,21 @@
+meta {
+  name: 18-404-not-found
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z0404
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 404
+  res.body.code: CLIENT_DETAILS_NOT_FOUND
+  res.body.message: Client details were not found
+}

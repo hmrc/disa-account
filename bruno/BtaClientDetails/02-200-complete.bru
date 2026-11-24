@@ -1,0 +1,22 @@
+meta {
+  name: 02-200-complete
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z1234
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 200
+  res.body.organisationDetails.zRefNumber: Z1234
+  res.body.businessVerification.companyName: Test Isa Manager Ltd
+  res.body.isaProductsChangeUnderReview: false
+}
