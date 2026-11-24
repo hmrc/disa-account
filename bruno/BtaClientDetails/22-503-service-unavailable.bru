@@ -1,0 +1,21 @@
+meta {
+  name: 22-503-service-unavailable
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z0503
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 503
+  res.body.code: SERVICE_UNAVAILABLE
+  res.body.message: Service is currently unavailable
+}

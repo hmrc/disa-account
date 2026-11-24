@@ -1,0 +1,21 @@
+meta {
+  name: 03-400-invalid-zref
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/z1234
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 400
+  res.body.code: INVALID_ZREFERENCE_FORMAT
+  res.body.message: Z-Reference format is invalid
+}

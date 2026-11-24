@@ -1,0 +1,21 @@
+meta {
+  name: 20-500-upstream-error
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z0500
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 500
+  res.body.code: INTERNAL_SERVER_ERROR
+  res.body.message: Internal server error
+}

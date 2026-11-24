@@ -1,0 +1,21 @@
+meta {
+  name: 12-403-missing-enrolment
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/disa-account/client-details/business-tax-account/Z1234
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: {{btaAuthorisation}}
+}
+
+assert {
+  res.status: 403
+  res.body.code: DISA_ENROLMENT_NOT_FOUND
+  res.body.message: An active DISA enrolment matching the requested Z-Reference is required
+}

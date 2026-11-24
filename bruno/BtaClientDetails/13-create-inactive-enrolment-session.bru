@@ -1,0 +1,52 @@
+meta {
+  name: 13-create-inactive-enrolment-session
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{authLoginBaseUrl}}/government-gateway/session/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "credId": "{{btaCredId}}",
+    "affinityGroup": "Organisation",
+    "credentialStrength": "strong",
+    "credentialRole": "admin",
+    "enrolments": [
+      {
+        "key": "HMRC-DISA-ORG",
+        "identifiers": [
+          {
+            "key": "ZREF",
+            "value": "Z1234"
+          }
+        ],
+        "state": "NotYetActivated"
+      }
+    ]
+  }
+}
+
+script:pre-request {
+  bru.setVar("btaCredId", String(Date.now()) + String(Math.floor(Math.random() * 1000)).padStart(3, "0"));
+}
+
+script:post-response {
+  const authorisation = res.getHeader("authorization");
+  if (!authorisation) {
+    throw new Error("auth-login-api did not return an Authorization header");
+  }
+  bru.setVar("btaAuthorisation", authorisation);
+}
+
+assert {
+  res.status: 201
+}

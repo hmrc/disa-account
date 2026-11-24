@@ -29,6 +29,31 @@ Application-generated errors use JSON with a `message` field:
 
 Internal-auth supplies its standard authentication/permission failure responses (401/403).
 
+### Business Tax Account client details
+
+`GET /disa-account/client-details/business-tax-account/:zReference` requires the user's
+bearer token, `Organisation` affinity and an active `HMRC-DISA-ORG` enrolment with a
+`ZREF` identifier matching the path. Z-references must match `^Z[0-9]{4}$`.
+
+Returns `200 OK` with client details through dedicated response objects.
+Errors use JSON with `code` and `message` fields:
+
+```json
+{"code":"UNAUTHORIZED","message":"Authentication is required"}
+```
+
+| Status | Code | Context |
+| --- | --- | --- |
+| 400 | `INVALID_ZREFERENCE_FORMAT` | Invalid Z-reference format. |
+| 401 | `UNAUTHORIZED` | Missing, invalid or expired bearer session. |
+| 401 | `USER_IS_NOT_AN_ORGANISATION` | User lacks Organisation affinity. |
+| 403 | `DISA_ENROLMENT_NOT_FOUND` | No active DISA enrolment matching the requested ZREF. |
+| 404 | `CLIENT_DETAILS_NOT_FOUND` | ETMP confirms no registration exists. |
+| 503 | `SERVICE_UNAVAILABLE` | ETMP returns 503 after retries. |
+| 500 | `INTERNAL_SERVER_ERROR` | Other upstream errors or unexpected failures. |
+
+Bruno requests: [BtaClientDetails](bruno/BtaClientDetails).
+
 ### Agent preferences
 
 `GET /disa-account/agents/preferences` and `PUT /disa-account/agents/preferences` require the
